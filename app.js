@@ -2,7 +2,10 @@ const express = require('express');
 const exphbs = require('express-handlebars');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const methodOverride = require('method-override')
+const methodOverride = require('method-override');
+const flash = require('connect-flash');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
 const app = express();
 
 // Map global promise - get rid of warning
@@ -16,6 +19,30 @@ mongoose.connect('mongodb://localhost/vidjot-dev', {useNewUrlParser: true})
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
+//Method override
+
+app.use(methodOverride('_method'));
+
+app.use(cookieParser());
+//Express session midleware
+app.use(session({
+  secret: 'secret',
+  resave: true,
+  saveUninitialized: true,
+  cookie: {secure: true}
+}));
+
+app.use(flash());
+
+//GLobal variables
+
+app.use(function (req,res,next) { 
+  res.locals.success_msg = req.flash('success_msg');
+  res.locals.error_msg = req.flash('error_msg');
+  res.locals.error = req.flash('error');
+  next();
+});
+
 // Load Idea Model
 const Idea = require('./models/Idea');
 
@@ -25,9 +52,7 @@ app.engine('handlebars', exphbs({
 }));
 app.set('view engine', 'handlebars');
 
-//Method override
 
-app.use(methodOverride('_method'));
 
 //Index route
 app.get('/', (req,res) => {
@@ -69,6 +94,7 @@ app.put('/ideas/edit/:id', async (req,res) => {
 app.delete('/ideas/delete/:id', async (req,res) => {
   const idea = await Idea.findById(req.params.id);
   await idea.remove();
+  req.flash('success_msg', 'Video idea removed');
   res.redirect('/ideas');
 });
 

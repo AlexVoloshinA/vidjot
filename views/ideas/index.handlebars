@@ -3,9 +3,9 @@
   <div class="card card-body mb-2">
     <h4>{{title}}</h4>
     <p>{{details}}</p>
-    <a class="btn btn-dark btn-block" href="ideas/edit/{{id}}">Edit</a>
+    <a class="btn btn-dark btn-block mb-2" href="ideas/edit/{{id}}">Edit</a>
     <form action="ideas/delete/{{id}}?_method=DELETE" method="POST">
-      <button type="submit" class="btn btn-danger">DELETE</button>
+      <button type="submit" class="btn-block btn btn-danger">DELETE</button>
     </form>
   </div>
   {{else}}
